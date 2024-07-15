@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'database_helper.dart';
 import 'libro.dart';
-
+import 'mostrarLibros.dart';
 void main() {
   runApp(LibrotecaApp());
 }
@@ -153,7 +153,12 @@ class _LibrotecaHomePageState extends State<LibrotecaHomePage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: cargarLibros,
+                onPressed: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MostrarLibros()),
+                  );
+                },
                 child: Text('Mostrar Libros Guardados'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.brown.shade200, // Color café claro
