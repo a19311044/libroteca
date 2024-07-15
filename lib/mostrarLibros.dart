@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:libroteca/informacion_libro.dart';
 import 'database_helper.dart';
 import 'libro.dart';
-import 'mostrarLibros.dart';
+
 
 class MostrarLibros extends StatefulWidget {
   @override
