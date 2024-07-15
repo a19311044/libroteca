@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:libroteca/informacion_libro.dart';
 import 'database_helper.dart';
 import 'libro.dart';
+
 
 class MostrarLibros extends StatefulWidget {
   @override
@@ -67,7 +69,12 @@ class _MostrarLibrosState extends State<MostrarLibros> {
                           IconButton(
                             icon: Icon(Icons.search),
                             onPressed: () {
-                              // Acción al presionar el icono de búsqueda
+                              // Acción al presionar el icono de Informacion
+                              Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => MostrarInformacionLibros()),
+                              );
+
                             },
                           ),
                         ),
