@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
+import 'database_helper.dart';
+import 'libro.dart';
 
 void main() {
   runApp(LibrotecaApp());
@@ -25,6 +27,15 @@ class LibrotecaHomePage extends StatefulWidget {
 
 class _LibrotecaHomePageState extends State<LibrotecaHomePage> {
   String barcode = "";
+  final TextEditingController _tituloController = TextEditingController();
+  final TextEditingController _autorController = TextEditingController();
+  final TextEditingController _fechaController = TextEditingController();
+  final TextEditingController _isbnController = TextEditingController();
+  final TextEditingController _numeroPaginasController = TextEditingController();
+  final TextEditingController _editorialController = TextEditingController();
+  final TextEditingController _generoController = TextEditingController();
+  final TextEditingController _sinopsisController = TextEditingController();
+  List<Libro> _libros = [];
 
   Future<void> scanBarcode() async {
     try {
@@ -32,12 +43,36 @@ class _LibrotecaHomePageState extends State<LibrotecaHomePage> {
       if (result.rawContent.isNotEmpty) {
         setState(() {
           barcode = result.rawContent;
-          // Puedes actualizar otros campos según el resultado del escaneo aquí
         });
       }
     } catch (e) {
       // Manejar el error de escaneo
     }
+  }
+
+  Future<void> guardarLibro() async {
+    Libro nuevoLibro = Libro(
+      codigo: barcode,
+      titulo: _tituloController.text,
+      autor: _autorController.text,
+      fecha: _fechaController.text,
+      isbn: _isbnController.text,
+      numeroPaginas: int.tryParse(_numeroPaginasController.text) ?? 0,
+      editorial: _editorialController.text,
+      genero: _generoController.text,
+      sinopsis: _sinopsisController.text,
+    );
+
+    await DatabaseHelper().insertLibro(nuevoLibro);
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Libro guardado en la base de datos')));
+  }
+
+  Future<void> cargarLibros() async {
+    List<Libro> libros = await DatabaseHelper().libros();
+    setState(() {
+      _libros = libros;
+    });
   }
 
   @override
@@ -65,16 +100,17 @@ class _LibrotecaHomePageState extends State<LibrotecaHomePage> {
                 controller: TextEditingController(text: barcode),
               ),
               SizedBox(height: 16),
-              _buildTextField(label: 'Título'),
-              _buildTextField(label: 'Autor'),
-              _buildTextField(label: 'Fecha'),
-              _buildTextField(label: 'ISBN'),
-              _buildTextField(label: 'No. de Páginas'),
-              _buildTextField(label: 'Editorial'),
-              _buildTextField(label: 'Género'),
+              _buildTextField(label: 'Título', controller: _tituloController),
+              _buildTextField(label: 'Autor', controller: _autorController),
+              _buildTextField(label: 'Fecha', controller: _fechaController),
+              _buildTextField(label: 'ISBN', controller: _isbnController),
+              _buildTextField(label: 'No. de Páginas', controller: _numeroPaginasController),
+              _buildTextField(label: 'Editorial', controller: _editorialController),
+              _buildTextField(label: 'Género', controller: _generoController),
               _buildTextField(
                 label: 'Sinópsis',
                 maxLines: 5,
+                controller: _sinopsisController,
               ),
               SizedBox(height: 16),
               Image.asset(
@@ -91,7 +127,16 @@ class _LibrotecaHomePageState extends State<LibrotecaHomePage> {
                     },
                     child: Text('Limpiar consulta'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown,
+                      backgroundColor: Colors.brown.shade200, // Color café claro
+                      foregroundColor: Colors.brown.shade800, // Letras café oscuro
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: guardarLibro,
+                    child: Text('Guardar'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.brown.shade200, // Color café claro
+                      foregroundColor: Colors.brown.shade800, // Letras café oscuro
                     ),
                   ),
                   ElevatedButton(
@@ -100,10 +145,33 @@ class _LibrotecaHomePageState extends State<LibrotecaHomePage> {
                     },
                     child: Text('Agregar a mi Biblioteca'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown,
+                      backgroundColor: Colors.brown.shade200, // Color café claro
+                      foregroundColor: Colors.brown.shade800, // Letras café oscuro
                     ),
                   ),
                 ],
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: cargarLibros,
+                child: Text('Mostrar Libros Guardados'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown.shade200, // Color café claro
+                  foregroundColor: Colors.brown.shade800, // Letras café oscuro
+                ),
+              ),
+              SizedBox(height: 16),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: _libros.length,
+                itemBuilder: (context, index) {
+                  final libro = _libros[index];
+                  return ListTile(
+                    title: Text(libro.titulo),
+                    subtitle: Text(libro.autor),
+                  );
+                },
               ),
             ],
           ),
@@ -129,11 +197,12 @@ class _LibrotecaHomePageState extends State<LibrotecaHomePage> {
     );
   }
 
-  Widget _buildTextField({required String label, int maxLines = 1}) {
+  Widget _buildTextField({required String label, required TextEditingController controller, int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         maxLines: maxLines,
+        controller: controller,
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(),
