@@ -1,144 +1,135 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'crearcuenta.dart'; // Asegúrate de importar correctamente el archivo de la página de creación de cuenta
+import 'welcome_page.dart'; // Importa el archivo de la página de bienvenida
 
-class LoginLibroteca extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _LoginLibrotecaState createState() => _LoginLibrotecaState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginLibrotecaState extends State<LoginLibroteca> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  void _handleLogin(BuildContext context) async {
-    try {
-      var url = 'http://localhost:3000/login'; // URL de tu servidor Node.js
-
-      var response = await http.post(Uri.parse(url), body: {
-        'username': _usernameController.text,
-        'password': _passwordController.text,
-      });
-
-      if (response.statusCode == 200) {
-        print('Respuesta del servidor: ${response.body}');
-        var data = jsonDecode(response.body); // Convertir la respuesta JSON a un objeto Dart
-
-        if (data['success']) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login exitoso')));
-          // Implementa la navegación a la siguiente pantalla o acción deseada
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Credenciales incorrectas')));
-        }
-      } else {
-        print('Error en la solicitud: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error en la solicitud')));
-      }
-    } catch (e) {
-      print('Error al conectar al servidor: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al conectar al servidor')));
-    }
-  }
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Color(0xFFFFF0D2),
+      backgroundColor: Color(0xFFFFF0D2),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
             Text(
               'Libroteca',
-              style: GoogleFonts.abhayaLibre(
-                fontWeight: FontWeight.w400,
-                fontSize: 64,
+              style: TextStyle(
+                fontFamily: 'Abhaya Libre',
                 color: Color(0xFF6F4E0E),
+                fontSize: 60,
               ),
             ),
-            SizedBox(height: 20),
-            Container(
-              width: 310,
-              height: 310,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                backgroundBlendMode: BlendMode.multiply,
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: AssetImage('images/loginlogo.png'),
+            Image.network(
+              'https://i.ibb.co/mNR2Prs/libroteca.png',
+              width: 300,
+              height: 216,
+              fit: BoxFit.cover,
+            ),
+            SizedBox(height: 50),
+            Text(
+              'Login',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                color: Color(0xFF6F4E0E),
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Correo electrónico o Usuario',
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFCEA75C), width: 2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF6F4E0E), width: 2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  labelStyle: TextStyle(
+                    color: Color(0xFF6F4E0E), // Color del texto de la etiqueta
+                  ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _buildLoginForm(),
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: TextFormField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFCEA75C), width: 2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF6F4E0E), width: 2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  labelStyle: TextStyle(
+                    color: Color(0xFF6F4E0E), // Color del texto de la etiqueta
+                  ),
+                ),
+                obscureText: true,
+              ),
             ),
             SizedBox(height: 20),
-            _buildAdditionalLinks(),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WelcomePageWidget(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, 
+                backgroundColor: Color(0xFF6F4E0E),
+              ),
+              child: Text('Iniciar sesión'),
+            ),
+            TextButton(
+              onPressed: () {
+                print('Olvidó su contraseña pressed ...');
+              },
+              child: Text('¿Olvidó su contraseña?'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CreateAccountPageWidget(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, 
+                backgroundColor: Color(0xFFCEA75C),   // Cambia el color del texto a blanco
+              ),
+              child: Text('Crear una cuenta'),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildLoginForm() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          TextFormField(
-            controller: _usernameController,
-            decoration: InputDecoration(
-              labelText: 'Usuario',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          SizedBox(height: 10),
-          TextFormField(
-            controller: _passwordController,
-            decoration: InputDecoration(
-              labelText: 'Contraseña',
-              border: OutlineInputBorder(),
-            ),
-            obscureText: true,
-          ),
-          SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {
-              _handleLogin(context); // Llamar al método de manejo de login
-            },
-            child: Text('Login'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAdditionalLinks() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextButton(
-          onPressed: () {
-            // Implementar la lógica para 'Forgot password?'
-          },
-          child: Text('Forgot password?'),
-        ),
-        SizedBox(width: 20),
-        TextButton(
-          onPressed: () {
-            // Implementar la lógica para 'Create an account'
-          },
-          child: Text('Create an account'),
-        ),
-      ],
     );
   }
 }
